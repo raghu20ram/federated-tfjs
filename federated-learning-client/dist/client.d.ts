@@ -1,0 +1,50 @@
+/// <reference types="socket.io-client" />
+import * as tf from '@tensorflow/tfjs';
+import { AsyncTfModel, ClientHyperparams, FederatedCompileConfig, SerializedVariable, UploadCallback, VersionCallback } from './common';
+import { FederatedClientModel } from './models';
+declare type SocketCallback = () => SocketIOClient.Socket;
+export declare type FederatedClientConfig = {
+    modelCompileConfig?: FederatedCompileConfig;
+    hyperparams?: ClientHyperparams;
+    verbose?: boolean;
+    clientId?: string;
+    sendMetrics?: boolean;
+};
+export declare class Client {
+    private msg;
+    private model;
+    private socket;
+    private versionCallbacks;
+    private uploadCallbacks;
+    private x;
+    private y;
+    private versionUpdateCounts;
+    private server;
+    private verbose;
+    private sendMetrics;
+    hyperparams: ClientHyperparams;
+    clientId: string;
+    constructor(server: string | SocketCallback, model: FederatedClientModel | AsyncTfModel, config?: FederatedClientConfig);
+    modelVersion(): string;
+    onNewVersion(callback: VersionCallback): void;
+    onUpload(callback: UploadCallback): void;
+    setup(): Promise<void>;
+    dispose(): void;
+    federatedUpdate(x: tf.Tensor, y: tf.Tensor): Promise<void>;
+    evaluate(x: tf.Tensor, y: tf.Tensor): number[];
+    predict(x: tf.Tensor): tf.Tensor;
+    readonly inputShape: number[];
+    readonly outputShape: number[];
+    numUpdates(): number;
+    numVersions(): number;
+    numExamples(): number;
+    private hyperparam;
+    numExamplesPerUpdate(): number;
+    numExamplesRemaining(): number;
+    private uploadVars;
+    protected setVars(newVars: SerializedVariable[]): void;
+    private connectTo;
+    private log;
+    private time;
+}
+export {};
